@@ -5,12 +5,6 @@ namespace Illuminate\Foundation\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
-use App\Gateway as Gateway;
-use App\Social as Social;
-use App\Support as Support;
-use App\GeneralSettings as GS;
-use App\User as User;
-use Session;
 
 trait AuthenticatesUsers
 {
@@ -23,11 +17,7 @@ trait AuthenticatesUsers
      */
     public function showLoginForm()
     {
-        $socials = Social::all();
-        $supports = Support::all();
-        $gs = GS::first();
-        $gateways = Gateway::all();
-        return view('users.login', ['gateways' => $gateways, 'socials' => $socials, 'supports' => $supports, 'gs' => $gs]);
+        return view('auth.login');
     }
 
     /**
@@ -50,13 +40,6 @@ trait AuthenticatesUsers
 
             return $this->sendLockoutResponse($request);
         }
-        
-        $user = User::where('username', $request->username)
-                      ->first();
-        if ($user->status == 'blocked') {
-            Session::flash('alert', 'Your account has been banned!!');
-            return redirect()->back();
-        }        
 
         if ($this->attemptLogin($request)) {
             return $this->sendLoginResponse($request);
@@ -158,7 +141,7 @@ trait AuthenticatesUsers
      */
     public function username()
     {
-        return 'username';
+        return 'email';
     }
 
     /**
@@ -169,15 +152,11 @@ trait AuthenticatesUsers
      */
     public function logout(Request $request)
     {
-        Auth::logout();
-        $request->session()->flush();
-        $request->session()->regenerate();
-        return redirect()->guest(route( 'login' ));
-        // $this->guard()->logout();
+        $this->guard()->logout();
 
-        // $request->session()->invalidate();
+        $request->session()->invalidate();
 
-        // return redirect('/');
+        return redirect('/');
     }
 
     /**

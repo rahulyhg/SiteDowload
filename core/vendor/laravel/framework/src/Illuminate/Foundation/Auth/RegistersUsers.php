@@ -5,11 +5,6 @@ namespace Illuminate\Foundation\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Auth\Events\Registered;
-use App\Gateway as Gateway;
-use App\Social as Social;
-use App\Support as Support;
-use App\GeneralSettings as GS;
-use App\User as User;
 
 trait RegistersUsers
 {
@@ -20,22 +15,9 @@ trait RegistersUsers
      *
      * @return \Illuminate\Http\Response
      */
-    public function showRegistrationForm($username = null)
+    public function showRegistrationForm()
     {
-        $gateways = Gateway::all();
-        $data['gateways'] = $gateways;
-        $data['socials'] = Social::all();
-        $data['supports'] = Support::all();
-        $data['gs'] = GS::first();
-        if ($username != null) {
-            $user = User::where('username', $username)->first();
-            if(empty($user)) {
-                return back();
-            }
-        }
-
-        $data['username'] = $username;
-        return view('users.register', $data);
+        return view('auth.register');
     }
 
     /**
